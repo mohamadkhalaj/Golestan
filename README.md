@@ -1,4 +1,4 @@
-Golestan bot for getting summery of education data.
+Golestan bot for getting summary of education data.
 
 ## Dependencies
 Create virtualenvironment and run:
@@ -38,7 +38,7 @@ for avoid rate-limit in order to dedubbing, pass `nolimit=debug` to.</br>
 ##### Notice that `debug=nolimit` parameter is optional
 
 ## Deploy
-Change following confs in `settings.py`
+Change following configs in `settings.py`
 - Replace `SECRET_KEY` with your own
 - Make sure `DEBUG` value is `False`
 - Replace `*` in `ALLOWED_HOSTS` with your domain
