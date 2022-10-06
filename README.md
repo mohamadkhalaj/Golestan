@@ -1,4 +1,3 @@
-# golestanSummeryOfScores
 Golestan bot for getting summery of education data.
 
 ## Dependencies
