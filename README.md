@@ -31,11 +31,11 @@ $ python3 manage.py createsuperuser
 ## API
 The only endpoint is `/api/`
 ### Request method
-`POST /api/`
-data: `stun=STUDENT_NUMBER&password=STUDENT_PASSWORD`
-for avoid rate-limit in order to dedubbing, pass `nolimit=debug` to.
-#### simple curl example
-`curl 'http://localhost:8000/api/' -X POST -H 'Content-Type: application/x-www-form-urlencoded' --data-raw 'stun=STUDENT_NUMBER&password=STUDENT_PASSWORD&debug=nolimit'`
+`POST /api/`</br>
+data: `stun=STUDENT_NUMBER&password=STUDENT_PASSWORD`</br>
+for avoid rate-limit in order to dedubbing, pass `nolimit=debug` to.</br>
+#### Simple curl example
+`$ curl 'http://localhost:8000/api/' -X POST -H 'Content-Type: application/x-www-form-urlencoded' --data-raw 'stun=STUDENT_NUMBER&password=STUDENT_PASSWORD&debug=nolimit'`
 ##### Notice that `debug=nolimit` parameter is optional
 
 ## Deploy
