@@ -32,13 +32,13 @@ The only endpoint is `/api/`
 ### Request method
 `POST /api/`</br>
 data: `stun=STUDENT_NUMBER&password=STUDENT_PASSWORD`</br>
-for avoid rate-limit in order to dedubbing, pass `nolimit=debug` to.</br>
+for avoid rate-limit in order to debugging, pass `nolimit=debug` to.</br>
 #### Simple curl example
 `$ curl 'http://localhost:8000/api/' -X POST -H 'Content-Type: application/x-www-form-urlencoded' --data-raw 'stun=STUDENT_NUMBER&password=STUDENT_PASSWORD&debug=nolimit'`
 ##### Notice that `debug=nolimit` parameter is optional
 
 ## Deploy
-Change following configs in `settings.py`
+Change following configs in `settings.py`:
 - Replace `SECRET_KEY` with your own
 - Make sure `DEBUG` value is `False`
 - Replace `*` in `ALLOWED_HOSTS` with your domain
