@@ -216,17 +216,24 @@ def login(Stun, password):
     print("*" * 50, "resCookie", "*" * 50)
     print(resCookies)
 
+    try:
+        session = getSessionID(response)
+    except Exception as e:
+        jsonResponse["status"] = "بعلت لاگین بیش از حد توسط گلستان محدود شده اید. 1 ساعت دیگر دوباره وارد شوید."
+        return jsonResponse
+
     cookies = {
         "u": resCookies["u"],
         "lt": resCookies["lt"],
         "su": "0",
         "ft": "0",
         "f": "1",
+        "ASP.NET_SessionId": session,
         "seq": str(getSeq(response)),
     }
 
     params = (
-        ("r", "0.4113340195383345"),
+        ("r", "0.656196360363224"),
         ("fid", "0;11130"),
         ("b", ""),
         ("l", ""),
@@ -249,12 +256,6 @@ def login(Stun, password):
 
     print("*" * 50, "params", "*" * 50)
     print(params)
-
-    try:
-        session = getSessionID(response)
-    except Exception as e:
-        jsonResponse["status"] = "بعلت لاگین بیش از حد توسط گلستان محدود شده اید. 1 ساعت دیگر دوباره وارد شوید."
-        return jsonResponse
 
     ctck = getTicket(response)
     resCookies = response.cookies.get_dict()
