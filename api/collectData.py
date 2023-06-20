@@ -258,12 +258,11 @@ def login(Stun, password):
     print(params)
 
     try:
-        session = getSessionID(response)
+        ctck = getTicket(response)
     except Exception as e:
         jsonResponse["status"] = "بعلت لاگین بیش از حد توسط گلستان محدود شده اید. 1 ساعت دیگر دوباره وارد شوید."
         return jsonResponse
 
-    ctck = getTicket(response)
     resCookies = response.cookies.get_dict()
     cookies = {
         "u": resCookies["u"],
