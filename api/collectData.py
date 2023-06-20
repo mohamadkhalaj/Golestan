@@ -491,7 +491,7 @@ def login(Stun, password):
         print("You got limited! try again later.")
         jsonResponse[
             "status"
-        ] = "شما بیش از این مجاز به گرفتن این اطلاعات از گلستان نیستسد! 1 ساعت دیگر دوباره امتحان کنید."
+        ] = "شما بیش از این مجاز به گرفتن این اطلاعات از گلستان نیستید! 1 ساعت دیگر دوباره امتحان کنید."
         return jsonResponse
 
     soup = readData(res)
