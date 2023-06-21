@@ -525,7 +525,7 @@ def login(Stun, password):
         return jsonResponse
 
     soup = readData(res)
-    terms = soup.find_all("n")
+    terms = soup.find_all("n", attrs={"f4455": True})
     latestTerm = getPendingTerm(terms)
     userInfo = getUserInfo(terms, latestTerm, Stun)
     userData = getUserGrades(userInfo, s, session, response, resCookies["u"], resCookies["lt"], Stun)
