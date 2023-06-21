@@ -18,6 +18,8 @@ def getPendingTerm(terms):
     for index, term in enumerate(terms):
         if term["f4455"] == "مشغول به تحصيل _ عادي":
             latest = index
+    if latest == 0:
+        latest = index
     return latest
 
 
@@ -34,7 +36,23 @@ def getGrades(courses):
     return ar
 
 
+def current_term_gpa(courses):
+    summation = 0
+    vahed = 0
+    for course in courses:
+        if course["nomre"]:
+            summation += float(course["nomre"]) * float(course["vahed"])
+            vahed += float(course["vahed"])
+    return str(
+        round(
+            summation / vahed,
+            2,
+        )
+    )
+
+
 def getUserGrades(userInfo, s, session, response, u, lt, Stun):
+    last_term = userInfo["summery"]["termYear"]
     cookies = {
         "u": u,
         "lt": lt,
@@ -90,6 +108,11 @@ def getUserGrades(userInfo, s, session, response, u, lt, Stun):
         soup = readData(res)
         courses = soup.find_all("n")[3:]
         courseData = getGrades(courses)
+        if term == last_term:
+            last_term_gpa = userInfo["summery"]["data"][-1]["moaddel"]
+            if not last_term_gpa:
+                userInfo["summery"]["data"][-1]["moaddel"] = current_term_gpa(courseData)
+
         userInfo[term] = courseData
 
     return userInfo
