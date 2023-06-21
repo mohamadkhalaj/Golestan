@@ -43,6 +43,8 @@ def current_term_gpa(courses):
         if course["nomre"]:
             summation += float(course["nomre"]) * float(course["vahed"])
             vahed += float(course["vahed"])
+    if vahed == 0:
+        return ""
     return str(
         round(
             summation / vahed,
