@@ -36,11 +36,19 @@ def getGrades(courses):
     return ar
 
 
+def is_float(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
 def current_term_gpa(courses):
     summation = 0
     vahed = 0
     for course in courses:
-        if course["nomre"]:
+        if is_float(course["nomre"]):
             summation += float(course["nomre"]) * float(course["vahed"])
             vahed += float(course["vahed"])
     if vahed == 0:
