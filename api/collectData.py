@@ -23,6 +23,17 @@ def getPendingTerm(terms):
     return latest
 
 
+def get_grade_faculty_major(response):
+    soup = BeautifulSoup(response.content, "html.parser")
+    script = soup.find_all("script")[0].string
+    faculty = re.findall("F61151 = \\'(.*?)\\';", script)[0]
+    major = re.findall("F17551 = \\'(.*?)\\';", script)[0]
+    grade = re.findall("F41301 = \\'(.*?)\\';", script)[0]
+    grade_type = re.findall("F41351 = \\'(.*?)\\';", script)[0]
+
+    return faculty, major, grade + "-" + grade_type
+
+
 def getGrades(courses):
     ar = []
     for course in courses:
@@ -128,7 +139,7 @@ def getUserGrades(userInfo, s, session, response, u, lt, Stun):
     return userInfo
 
 
-def getUserInfo(terms, latestTerm, Stun):
+def getUserInfo(terms, latestTerm, Stun, faculty, major, grade):
     global Name
     term = terms[latestTerm]
     userInfo = {}
@@ -151,6 +162,9 @@ def getUserInfo(terms, latestTerm, Stun):
     userData["moaddelKol"] = term["cumgpa"].strip()
     userData["name"] = Name[0] + " " + Name[1]
     userData["stun"] = Stun.strip()
+    userData["faculty"] = faculty.strip()
+    userData["major"] = major.strip()
+    userData["grade"] = grade.strip()
     userInfo["summery"] = userData
     return userInfo
 
@@ -532,10 +546,17 @@ def login(Stun, password):
         ] = "شما بیش از این مجاز به گرفتن این اطلاعات از گلستان نیستید! 1 ساعت دیگر دوباره امتحان کنید."
         return jsonResponse
 
+    if "دسترسي به اطلاعات مورد نظر را نداريد" in response.text:
+        jsonResponse[
+            "status"
+        ] = "شما بیش از این مجاز به گرفتن این اطلاعات از گلستان نیستید! 1 ساعت دیگر دوباره امتحان کنید."
+        return jsonResponse
+
+    faculty, major, grade = get_grade_faculty_major(response)
     soup = readData(res)
     terms = soup.find_all("n", attrs={"f4455": True})
     latestTerm = getPendingTerm(terms)
-    userInfo = getUserInfo(terms, latestTerm, Stun)
+    userInfo = getUserInfo(terms, latestTerm, Stun, faculty, major, grade)
     userData = getUserGrades(userInfo, s, session, response, resCookies["u"], resCookies["lt"], Stun)
     user.save()
     return userData
