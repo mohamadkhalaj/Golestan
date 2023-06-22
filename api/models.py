@@ -4,26 +4,29 @@ from django.db import models
 
 # Create your models here.
 class setting(models.Model):
-	rateLimit = models.FloatField()
+    rateLimit = models.FloatField()
 
-	def __str__(self):
-		return 'setting'
+    def __str__(self):
+        return "setting"
+
 
 class student(models.Model):
-	stun = models.CharField(max_length=10, primary_key=True)
-	name = models.CharField(max_length=256)
-	lastTry = models.DateTimeField(auto_now=True)
+    stun = models.CharField(max_length=10, primary_key=True)
+    name = models.CharField(max_length=256)
+    lastTry = models.DateTimeField(auto_now=True)
 
-	def humanizeTime(self):
-		return naturaltime(self.lastTry)
-	humanizeTime.short_description = 'Last try'
- 
-	def __str__(self):
-		return self.stun
+    def humanizeTime(self):
+        return naturaltime(self.lastTry)
+
+    humanizeTime.short_description = "Last try"
+
+    def __str__(self):
+        return self.stun
+
 
 def get_rate_limit():
     try:
         return setting.objects.get(pk=1).rateLimit
     except:
-        setting.objects.create(rateLimit=10)
-        return 10
+        setting.objects.create(rateLimit=2)
+        return 2

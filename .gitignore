@@ -11,7 +11,7 @@ staticfiles
 
 # C extensions
 *.so
-
+student.json
 # Distribution / packaging
 .Python
 build/
