@@ -316,7 +316,7 @@ def login(Stun, password):
 
     try:
         ctck = get_ticket(response)
-    except Exception as e:
+    except:
         json_response["status"] = "بعلت لاگین بیش از حد توسط گلستان محدود شده اید. 1 ساعت دیگر دوباره وارد شوید."
         return json_response
 
@@ -542,6 +542,7 @@ def login(Stun, password):
            f"%2FQgblrupixd0OeDtIT9ZdnhdeL8cB2%2FFDcW9qBhJ8WXskwUF7J3lSqbzmxGnF1NVKudV1T270p51Uk%2FL1llMj9hCQ%3D%3D" \
            f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION" \
            f"=kqy8QEHTvRp1tGzItQv8Zw7V0gg9FSEoYTb0Tuys5EWy1zJ49l14RMA9YVoi7OGATV2Wc4TdXhKNHzU4mYPxbu86iw75hcLx6jSdCNcP1LNBlw1jwrb6x5bhcEPIRSkph7QSNYldljuklZSaP4u%2BaplVnRZMITqO0xknPzR0wKh1lzumRetFMreciDVoKW22xaTEBm0SFhNYaE0%2F6LfnnvIA84YYYr4WYxHT6nSiQ9WyAu%2FHCgHeNd%2BxOQnYRIN7umbWtZqMX58%2F00UyS1tH0Q%3D%3D&Fm_Action=08&Frm_Type=0&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr+F41251%3D%22{Stun}%22%2F%3E&ex="
+
     ## Fifth request - second
     response = s.post(
         "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
@@ -566,7 +567,7 @@ def login(Stun, password):
     try:
         res = re.findall("T01XML='(.*)';", response.content.decode("utf-8"))[0]
     except:
-        print("You got limited! try again later.")
+        print("You've got limited! try again later.")
         json_response[
             "status"
         ] = "شما بیش از این مجاز به گرفتن این اطلاعات از گلستان نیستید! 1 ساعت دیگر دوباره امتحان کنید."
