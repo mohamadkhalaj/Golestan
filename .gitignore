@@ -137,3 +137,10 @@ dmypy.json
 /.cloud/
 .cloud/
 /.cloud
+/.idea/Golestan.iml
+/.idea/dataSources.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
+/.idea/.gitignore
