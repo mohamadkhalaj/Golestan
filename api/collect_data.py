@@ -185,32 +185,23 @@ def get_user_name(response):
     return name.group(1), name.group(2)
 
 
-def check_response(response):
-    print(response.content.decode("utf-8"))
-
-
 def get_seq(response):
     res = make_tuple(re.findall("parent.Commander.SavAut(.*?);", response.content.decode("utf-8"))[0])
     return res[6]
-
-
-def values(response):
-    res = make_tuple(re.findall("parent.Commander.SavAut(.*?);", response.content.decode("utf-8"))[0])
-    return res
 
 
 def get_session_id(response):
     return response.cookies.get_dict()["ASP.NET_SessionId"]
 
 
-def login(Stun, password):
+def login(stun, password):
     global Name
     login_url = "https://golestan.ikiu.ac.ir/Forms/AuthenticateUser/AuthUser.aspx"
 
     try:
-        user = student.objects.get(stun=Stun)
+        user = student.objects.get(stun=stun)
     except:
-        user = student(stun=Stun)
+        user = student(stun=stun)
 
     json_response = {}
     captcha = ""
@@ -248,7 +239,7 @@ def login(Stun, password):
            f"%2Bc2m3n4ALG8S7ZiLlJqSsuXBsjGz" \
            f"%2FLlbfviBrHuco87ksZgLcCRt9NnSPADSFObzNVq3ShPZSQos3ErAwfDmhlNwH4qEsT6FfmV7ULQ7j" \
            f"%2FFGM5sO5GzNDLxCLDFj1724Jc3Y%2BlrbM5jHMQ3800JLSzB8cvT0PujcljIJ7JpjSJMqHuPBKXt1c%2B%2BVTuIBSvjVJnUw2o" \
-           f"&TxtMiddle=%3Cr+F51851%3D%22%22+F80401%3D%22{password}%22+F80351%3D%22{Stun}%22+F51701%3D%22" \
+           f"&TxtMiddle=%3Cr+F51851%3D%22%22+F80401%3D%22{password}%22+F80351%3D%22{stun}%22+F51701%3D%22" \
            f"{captcha}%22+F83181%3D%22%22%2F%3E&Fm_Action=09&Frm_Type=&Frm_No=&TicketTextBox="
 
     ## First request
@@ -503,8 +494,8 @@ def login(Stun, password):
     print("*" * 50, "params", "*" * 50)
     print(params)
 
-    cookies["sno"] = Stun
-    cookies["stdno"] = Stun
+    cookies["sno"] = stun
+    cookies["stdno"] = stun
     cookies["f"] = "12310"
     cookies["su"] = "3"
 
@@ -541,7 +532,7 @@ def login(Stun, password):
     data = f"__VIEWSTATE=qxK%2FppR35p5Aud2d23a%2FzBn0bVp1IbJ3fCjyBF0z7P%2BcWa149tMd2W3IPjiKz" \
            f"%2FQgblrupixd0OeDtIT9ZdnhdeL8cB2%2FFDcW9qBhJ8WXskwUF7J3lSqbzmxGnF1NVKudV1T270p51Uk%2FL1llMj9hCQ%3D%3D" \
            f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION" \
-           f"=kqy8QEHTvRp1tGzItQv8Zw7V0gg9FSEoYTb0Tuys5EWy1zJ49l14RMA9YVoi7OGATV2Wc4TdXhKNHzU4mYPxbu86iw75hcLx6jSdCNcP1LNBlw1jwrb6x5bhcEPIRSkph7QSNYldljuklZSaP4u%2BaplVnRZMITqO0xknPzR0wKh1lzumRetFMreciDVoKW22xaTEBm0SFhNYaE0%2F6LfnnvIA84YYYr4WYxHT6nSiQ9WyAu%2FHCgHeNd%2BxOQnYRIN7umbWtZqMX58%2F00UyS1tH0Q%3D%3D&Fm_Action=08&Frm_Type=0&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr+F41251%3D%22{Stun}%22%2F%3E&ex="
+           f"=kqy8QEHTvRp1tGzItQv8Zw7V0gg9FSEoYTb0Tuys5EWy1zJ49l14RMA9YVoi7OGATV2Wc4TdXhKNHzU4mYPxbu86iw75hcLx6jSdCNcP1LNBlw1jwrb6x5bhcEPIRSkph7QSNYldljuklZSaP4u%2BaplVnRZMITqO0xknPzR0wKh1lzumRetFMreciDVoKW22xaTEBm0SFhNYaE0%2F6LfnnvIA84YYYr4WYxHT6nSiQ9WyAu%2FHCgHeNd%2BxOQnYRIN7umbWtZqMX58%2F00UyS1tH0Q%3D%3D&Fm_Action=08&Frm_Type=0&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr+F41251%3D%22{stun}%22%2F%3E&ex="
 
     ## Fifth request - second
     response = s.post(
@@ -583,7 +574,7 @@ def login(Stun, password):
     soup = read_data(res)
     terms = soup.find_all("n", attrs={"f4455": True})
     latest_term = get_pending_term(terms)
-    user_info = get_user_info(terms, latest_term, Stun, faculty, major, grade)
-    user_data = get_user_grades(user_info, s, session, response, res_cookies["u"], res_cookies["lt"], Stun)
+    user_info = get_user_info(terms, latest_term, stun, faculty, major, grade)
+    user_data = get_user_grades(user_info, s, session, response, res_cookies["u"], res_cookies["lt"], stun)
     user.save()
     return user_data
