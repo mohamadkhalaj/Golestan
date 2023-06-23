@@ -15,10 +15,10 @@ class student(models.Model):
     name = models.CharField(max_length=256)
     lastTry = models.DateTimeField(auto_now=True)
 
-    def humanizeTime(self):
+    def humanize_time(self):
         return naturaltime(self.lastTry)
 
-    humanizeTime.short_description = "Last try"
+    humanize_time.short_description = "Last try"
 
     def __str__(self):
         return self.stun
@@ -26,7 +26,7 @@ class student(models.Model):
 
 def get_rate_limit():
     try:
-        return setting.objects.get(pk=1).rateLimit
+        return setting.objects.get(pk=1).rate_limit
     except:
         setting.objects.create(rateLimit=2)
         return 2
