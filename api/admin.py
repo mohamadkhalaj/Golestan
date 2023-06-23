@@ -11,7 +11,7 @@ class settingAdmin(admin.ModelAdmin):
 admin.site.register(setting, settingAdmin)
 
 class studentAdmin(admin.ModelAdmin):
-	list_display = ('name', 'stun', 'humanizeTime')
+	list_display = ('name', 'stun', 'humanize_time')
 	list_filter = ('stun', 'lastTry')
 	search_fields = ('name', 'stun')
 	ordering = ('-lastTry',)
