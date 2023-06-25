@@ -145,3 +145,4 @@ dmypy.json
 /.idea/vcs.xml
 /.idea/.gitignore
 /.idea/git_toolbox_prj.xml
+/upload.py
