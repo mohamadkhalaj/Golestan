@@ -27,7 +27,6 @@ readchar==2.0.1
 regex==2021.10.8
 requests==2.27.1
 requests-toolbelt==0.9.1
-runflare==1.1.4
 six==1.16.0
 soupsieve==2.3.1
 spinners==0.0.24
