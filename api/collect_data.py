@@ -37,8 +37,12 @@ def get_grade_faculty_major(response):
 def get_grades(courses):
     ar = []
     for course in courses:
-        courses_json = {"name": course["f0200"].strip(), "nomre": course["f3945"].strip(),
-                        "type": course["f3952"].strip(), "vahed": course["f0205"].strip()}
+        courses_json = {
+            "name": course["f0200"].strip(),
+            "nomre": course["f3945"].strip(),
+            "type": course["f3952"].strip(),
+            "vahed": course["f0205"].strip(),
+        }
         ar.append(courses_json)
 
     return ar
@@ -94,8 +98,8 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-                   "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.41827066214011355&fid=0%3b12310&b=10&l=1&tck"
-                   "=9D871E0D-BE1C-4E&&lastm=20180201081222",
+        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.41827066214011355&fid=0%3b12310&b=10&l=1&tck"
+        "=9D871E0D-BE1C-4E&&lastm=20180201081222",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -114,14 +118,16 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
             ("lastm", "20180201081222"),
         )
 
-        data = f"__VIEWSTATE=PSqS0taw2jaS4YTMUVe78LFSqRY0nc2wknK4DQuC%2F9KPJNv4%2BKLkm5Gg489PZPW6o7JM%2FuKFXvX" \
-               f"%2FVkuDuHLyCQ3nwsDYNPfhBiuc6CCPBqpRQqP7Z6pQKhZMCTsq2IMTj09PgNxg6uFsUnIaaMpBxw%3D%3D" \
-               f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION=Vs8M%2B9nHFU621jB1fDojqspw9XtULz4rCjkLOBl3%2B4" \
-               f"%2B6w3KFDV%2BVcv3O%2F8YEONVav%2F%2BX%2BlVcW7L9KzYgQRRQakCNziokDrPK8ykb9cSPYl" \
-               f"%2B1cMX8DrpUGu0EUQQUDXMsgr26ETIbuaj9nzFDI6FS" \
-               f"%2B7xxsrW0OjSreXoTNbuZZ9aeURNKddDbnkicqURFZq42ZrL94C2I9yuXtRYky2gdu%2BV3F0HMCAnk" \
-               f"%2FTvvddr5YrIoHyTmUhpJmxBNi%2BimnjXlrlcMDNBBTGFCzohQQksOTA%3D%3D&Fm_Action=80&Frm_Type=0&Frm_No" \
-               f"=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr+F41251%3D%22{Stun}%22+F43501%3D%22{term}%22%2F%3E&ex="
+        data = (
+            f"__VIEWSTATE=PSqS0taw2jaS4YTMUVe78LFSqRY0nc2wknK4DQuC%2F9KPJNv4%2BKLkm5Gg489PZPW6o7JM%2FuKFXvX"
+            f"%2FVkuDuHLyCQ3nwsDYNPfhBiuc6CCPBqpRQqP7Z6pQKhZMCTsq2IMTj09PgNxg6uFsUnIaaMpBxw%3D%3D"
+            f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION=Vs8M%2B9nHFU621jB1fDojqspw9XtULz4rCjkLOBl3%2B4"
+            f"%2B6w3KFDV%2BVcv3O%2F8YEONVav%2F%2BX%2BlVcW7L9KzYgQRRQakCNziokDrPK8ykb9cSPYl"
+            f"%2B1cMX8DrpUGu0EUQQUDXMsgr26ETIbuaj9nzFDI6FS"
+            f"%2B7xxsrW0OjSreXoTNbuZZ9aeURNKddDbnkicqURFZq42ZrL94C2I9yuXtRYky2gdu%2BV3F0HMCAnk"
+            f"%2FTvvddr5YrIoHyTmUhpJmxBNi%2BimnjXlrlcMDNBBTGFCzohQQksOTA%3D%3D&Fm_Action=80&Frm_Type=0&Frm_No"
+            f"=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr+F41251%3D%22{Stun}%22+F43501%3D%22{term}%22%2F%3E&ex="
+        )
 
         response = s.post(
             "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
@@ -233,14 +239,16 @@ def login(stun, password):
         "Te": "trailers",
     }
 
-    data = f"__VIEWSTATE" \
-           f"=%2FwEPDwUKMjA2NTYzNTQ5MmRk3pMVc3vrMpmJPeFlNuTZNAqnZ1IuvBAh7F6ibaOvjLcRmUq1Bo93homnh5DYRQi8BRW5Rzfi" \
-           f"%2BYZuKAERQqxuQQ%3D%3D&__VIEWSTATEGENERATOR=6A475423&__EVENTVALIDATION=%2FwEdAAZLlyHuYR3BLALr37" \
-           f"%2Bc2m3n4ALG8S7ZiLlJqSsuXBsjGz" \
-           f"%2FLlbfviBrHuco87ksZgLcCRt9NnSPADSFObzNVq3ShPZSQos3ErAwfDmhlNwH4qEsT6FfmV7ULQ7j" \
-           f"%2FFGM5sO5GzNDLxCLDFj1724Jc3Y%2BlrbM5jHMQ3800JLSzB8cvT0PujcljIJ7JpjSJMqHuPBKXt1c%2B%2BVTuIBSvjVJnUw2o" \
-           f"&TxtMiddle=%3Cr+F51851%3D%22%22+F80401%3D%22{password}%22+F80351%3D%22{stun}%22+F51701%3D%22" \
-           f"{captcha}%22+F83181%3D%22%22%2F%3E&Fm_Action=09&Frm_Type=&Frm_No=&TicketTextBox="
+    data = (
+        f"__VIEWSTATE"
+        f"=%2FwEPDwUKMjA2NTYzNTQ5MmRk3pMVc3vrMpmJPeFlNuTZNAqnZ1IuvBAh7F6ibaOvjLcRmUq1Bo93homnh5DYRQi8BRW5Rzfi"
+        f"%2BYZuKAERQqxuQQ%3D%3D&__VIEWSTATEGENERATOR=6A475423&__EVENTVALIDATION=%2FwEdAAZLlyHuYR3BLALr37"
+        f"%2Bc2m3n4ALG8S7ZiLlJqSsuXBsjGz"
+        f"%2FLlbfviBrHuco87ksZgLcCRt9NnSPADSFObzNVq3ShPZSQos3ErAwfDmhlNwH4qEsT6FfmV7ULQ7j"
+        f"%2FFGM5sO5GzNDLxCLDFj1724Jc3Y%2BlrbM5jHMQ3800JLSzB8cvT0PujcljIJ7JpjSJMqHuPBKXt1c%2B%2BVTuIBSvjVJnUw2o"
+        f"&TxtMiddle=%3Cr+F51851%3D%22%22+F80401%3D%22{password}%22+F80351%3D%22{stun}%22+F51701%3D%22"
+        f"{captcha}%22+F83181%3D%22%22%2F%3E&Fm_Action=09&Frm_Type=&Frm_No=&TicketTextBox="
+    )
 
     ## First request
     s = requests.Session()
@@ -323,12 +331,14 @@ def login(stun, password):
         "ctck": ctck,
     }
 
-    data = f"__VIEWSTATE=%2FwEPDwUKMTg5NzY5NjczOGRkYUDVSrQ4gKKlXHZpC7vZcGlJgTLPsZIAvGSZ%2FIZFhZ" \
-           f"%2F2SOqFiNzxPYofyD9Tfb9mtFcWafaiyEDeKi1If0vTKA%3D%3D&__VIEWSTATEGENERATOR=25DF661B&__EVENTVALIDATION" \
-           f"=%2FwEdAAc7lghiqMRe6gTOwdPMXHqGP8uVt%2B%2BIGse5yjzuSxmAtwJG302dI8ANIU5vM1WrdKE9lJCizcSsDB8OaGU3AfioSxPoV" \
-           f"%2BZXtQtDuP8UYzmw7oxw4gRCwvpu3X6T9xy%2B1mrgAsbxLtmIuUmpKy5cGyMbaThuHd7TyAdgVN58OJLAXj%2BRMPndAdlLJTU" \
-           f"%2B9lWfcDuOzzgqynWcQ9v8%2BRWa9N77dcG4tx9eUPLG4LOeVRvIbQ%3D%3D&Fm_Action=00&Frm_Type=&Frm_No" \
-           f"=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr%2F%3E&ex="
+    data = f"__VIEWSTATE=8PMg%2FXGkz21Jo6lFl1wV%2BG6zGMZJ27V9hN%2F" \
+           f"%2FQtcDNf4oZUW5mb0b7v4bV56pVIyLXFbCuSPD3cvVNuY6kqj4z" \
+           f"%2Bl8jWRZ5kGZgYaguBv4T27af0K1U3ZQwojfUXITMiBFjS1klAGeRDe2fRVcBFB3VA%3D%3D&__VIEWSTATEGENERATOR=25DF661B" \
+           f"&__EVENTVALIDATION=LbkdlrW%2FdjGKFMfWRDzI72UlPjqWROfiKJOUDUusM%2FxEcdNdKbRSY2iWnir" \
+           f"%2BZS2q14Ebo1ZEcVK0EoFGiRe7GYbblq13ynWnKvNE2FriZLj%2FCRnfLB%2BGykh" \
+           f"%2BpJCvpq9UUsSqIntjbwDRsiQEPeQQ3dbfmIAZCNPeytCcgtqATCPXTdD3i4FXL7yjPixv82eAbJcxcUY0hKwjdHSRKmDESzVK" \
+           f"%2FYQD2%2FFSW2qLX%2BytNTEZ57I%2BXBOAAr9QVJVuIw9u3KK27r%2FbycWoIN1m9zlSUA%3D%3D&Fm_Action=00&Frm_Type" \
+           f"=&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr%2F%3E&ex="
 
     headers1 = {
         "Host": "golestan.ikiu.ac.ir",
@@ -341,7 +351,7 @@ def login(stun, password):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F0202_PROCESS_REP_FILTER/F0202_01_PROCESS_REP_FILTER_DAT.ASPX?r"
-                   "=0.75486758742996&fid=1%3b102&b=10&l=1&tck=9691AB60-96A2-43&&lastm=20190829142532",
+        "=0.75486758742996&fid=1%3b102&b=10&l=1&tck=9691AB60-96A2-43&&lastm=20190829142532",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -450,8 +460,8 @@ def login(stun, password):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-                   "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0;12310&b=10&l=1&tck"
-                   "=6123BBB3-7555-49&&lastm=20180201081222",
+        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0;12310&b=10&l=1&tck"
+        "=6123BBB3-7555-49&&lastm=20180201081222",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -468,10 +478,12 @@ def login(stun, password):
         ("tck", save_tick),
         ("lastm", "20230514110830"),
     )
-    data = f"__VIEWSTATE=%2B4JaHQdzFS0AQBA3xD5k4JLGZuFB2TvLEMSoO00eytx83bhToohV%2BGSK11jXdQ%2Bu%2BKMVMTjEO" \
-           f"%2BeM8774ddKWRIB5itd5khSxV25sBMwUpb%2B5M%2FmK%2BulXmM6qCxSfNnqtXrR%2BM51Vf71DDyJH3e5tIg%3D%3D" \
-           f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION=FGuN%2BlEw%2BVnPsZEf%2B" \
-           f"%2FUj0cwUzIZHUHxXaiNu04XCxH7myMpYXQUtUHEpELGv14hyq4wMzunzlrqlja7MrWZ5kBDBTLpfDMqW7LnqwNmtTWdGQOUeVUe33xiTE1%2FgOOPTzNYZeMaEkV9mz1TPW9Rr8PFcGPTFfTh4WRx1LqkYWllWTAxRal3vQGGp4QsqN1gCrG8trbSPBNzGLSvvxrIUMZelNEy3s7UxyydH5wouLoPTGSOZq6XSL1aKh%2BkL6cZEoxaCvyVHwoA5%2FtHBQm5G7A%3D%3D&Fm_Action=00&Frm_Type=&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr%2F%3E&ex="
+    data = (
+        f"__VIEWSTATE=%2B4JaHQdzFS0AQBA3xD5k4JLGZuFB2TvLEMSoO00eytx83bhToohV%2BGSK11jXdQ%2Bu%2BKMVMTjEO"
+        f"%2BeM8774ddKWRIB5itd5khSxV25sBMwUpb%2B5M%2FmK%2BulXmM6qCxSfNnqtXrR%2BM51Vf71DDyJH3e5tIg%3D%3D"
+        f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION=FGuN%2BlEw%2BVnPsZEf%2B"
+        f"%2FUj0cwUzIZHUHxXaiNu04XCxH7myMpYXQUtUHEpELGv14hyq4wMzunzlrqlja7MrWZ5kBDBTLpfDMqW7LnqwNmtTWdGQOUeVUe33xiTE1%2FgOOPTzNYZeMaEkV9mz1TPW9Rr8PFcGPTFfTh4WRx1LqkYWllWTAxRal3vQGGp4QsqN1gCrG8trbSPBNzGLSvvxrIUMZelNEy3s7UxyydH5wouLoPTGSOZq6XSL1aKh%2BkL6cZEoxaCvyVHwoA5%2FtHBQm5G7A%3D%3D&Fm_Action=00&Frm_Type=&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr%2F%3E&ex="
+    )
 
     ## Fifth request
     response = s.post(
@@ -520,8 +532,8 @@ def login(stun, password):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-                   "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0%3b12310&b=10&l=1&tck"
-                   "=6123BBB3-7555-49&&lastm=20180201081222",
+        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0%3b12310&b=10&l=1&tck"
+        "=6123BBB3-7555-49&&lastm=20180201081222",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -529,10 +541,12 @@ def login(stun, password):
         "Te": "trailers",
     }
 
-    data = f"__VIEWSTATE=qxK%2FppR35p5Aud2d23a%2FzBn0bVp1IbJ3fCjyBF0z7P%2BcWa149tMd2W3IPjiKz" \
-           f"%2FQgblrupixd0OeDtIT9ZdnhdeL8cB2%2FFDcW9qBhJ8WXskwUF7J3lSqbzmxGnF1NVKudV1T270p51Uk%2FL1llMj9hCQ%3D%3D" \
-           f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION" \
-           f"=kqy8QEHTvRp1tGzItQv8Zw7V0gg9FSEoYTb0Tuys5EWy1zJ49l14RMA9YVoi7OGATV2Wc4TdXhKNHzU4mYPxbu86iw75hcLx6jSdCNcP1LNBlw1jwrb6x5bhcEPIRSkph7QSNYldljuklZSaP4u%2BaplVnRZMITqO0xknPzR0wKh1lzumRetFMreciDVoKW22xaTEBm0SFhNYaE0%2F6LfnnvIA84YYYr4WYxHT6nSiQ9WyAu%2FHCgHeNd%2BxOQnYRIN7umbWtZqMX58%2F00UyS1tH0Q%3D%3D&Fm_Action=08&Frm_Type=0&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr+F41251%3D%22{stun}%22%2F%3E&ex="
+    data = (
+        f"__VIEWSTATE=qxK%2FppR35p5Aud2d23a%2FzBn0bVp1IbJ3fCjyBF0z7P%2BcWa149tMd2W3IPjiKz"
+        f"%2FQgblrupixd0OeDtIT9ZdnhdeL8cB2%2FFDcW9qBhJ8WXskwUF7J3lSqbzmxGnF1NVKudV1T270p51Uk%2FL1llMj9hCQ%3D%3D"
+        f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION"
+        f"=kqy8QEHTvRp1tGzItQv8Zw7V0gg9FSEoYTb0Tuys5EWy1zJ49l14RMA9YVoi7OGATV2Wc4TdXhKNHzU4mYPxbu86iw75hcLx6jSdCNcP1LNBlw1jwrb6x5bhcEPIRSkph7QSNYldljuklZSaP4u%2BaplVnRZMITqO0xknPzR0wKh1lzumRetFMreciDVoKW22xaTEBm0SFhNYaE0%2F6LfnnvIA84YYYr4WYxHT6nSiQ9WyAu%2FHCgHeNd%2BxOQnYRIN7umbWtZqMX58%2F00UyS1tH0Q%3D%3D&Fm_Action=08&Frm_Type=0&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr+F41251%3D%22{stun}%22%2F%3E&ex="
+    )
 
     ## Fifth request - second
     response = s.post(

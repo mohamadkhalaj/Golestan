@@ -6,13 +6,19 @@ from .models import setting, student
 
 admin.site.site_header = 'API management system'
 
+
 class settingAdmin(admin.ModelAdmin):
-	list_display = ('rateLimit',)
+    list_display = ('rateLimit',)
+
+
 admin.site.register(setting, settingAdmin)
 
+
 class studentAdmin(admin.ModelAdmin):
-	list_display = ('name', 'stun', 'humanize_time')
-	list_filter = ('stun', 'lastTry')
-	search_fields = ('name', 'stun')
-	ordering = ('-lastTry',)
+    list_display = ('name', 'stun', 'humanize_time')
+    list_filter = ('stun', 'lastTry')
+    search_fields = ('name', 'stun')
+    ordering = ('-lastTry',)
+
+
 admin.site.register(student, studentAdmin)
