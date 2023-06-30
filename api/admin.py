@@ -8,7 +8,7 @@ admin.site.site_header = 'API management system'
 
 
 class settingAdmin(admin.ModelAdmin):
-    list_display = ('rateLimit',)
+    list_display = ('rate_limit',)
 
 
 admin.site.register(setting, settingAdmin)

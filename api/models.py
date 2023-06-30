@@ -4,7 +4,7 @@ from django.db import models
 
 # Create your models here.
 class setting(models.Model):
-    rateLimit = models.FloatField()
+    rate_limit = models.FloatField()
 
     def __str__(self):
         return "setting"
@@ -28,5 +28,5 @@ def get_rate_limit():
     try:
         return setting.objects.get(pk=1).rate_limit
     except:
-        setting.objects.create(rateLimit=2)
+        setting.objects.create(rate_limit=2)
         return 2
