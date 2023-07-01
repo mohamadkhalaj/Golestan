@@ -4,7 +4,7 @@ from datetime import datetime
 from django.http import HttpResponse, JsonResponse
 
 from .collect_data import login
-from .models import get_rate_limit, student
+from .models import get_rate_limit, Student
 
 # Create your views here.
 
@@ -13,9 +13,9 @@ def rate_limit(request, stun, debug):
     if debug == "nolimit":
         return True, 0
     try:
-        user = student.objects.get(stun=stun)
+        user = Student.objects.get(stun=stun)
         now = time.mktime(datetime.now().timetuple())
-        last_try = time.mktime(user.lastTry.timetuple())
+        last_try = time.mktime(user.last_try.timetuple())
         limit = get_rate_limit() * 60
         delta = (last_try + limit - now) / 60
         if now < last_try + limit:

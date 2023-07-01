@@ -1,22 +1,32 @@
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db import models
+from django.db.models import Sum
 
 
 # Create your models here.
-class setting(models.Model):
+class Setting(models.Model):
     rate_limit = models.FloatField()
 
     def __str__(self):
         return "setting"
 
+    @staticmethod
+    def total_requests():
+        return Student.objects.aggregate(Sum('total_tries'))['total_tries__sum']
 
-class student(models.Model):
+    @staticmethod
+    def total_users():
+        return Student.objects.count()
+
+
+class Student(models.Model):
     stun = models.CharField(max_length=10, primary_key=True)
     name = models.CharField(max_length=256)
-    lastTry = models.DateTimeField(auto_now=True)
+    last_try = models.DateTimeField(auto_now=True)
+    total_tries = models.PositiveBigIntegerField(default=0, editable=False)
 
     def humanize_time(self):
-        return naturaltime(self.lastTry)
+        return naturaltime(self.last_try)
 
     humanize_time.short_description = "Last try"
 
@@ -26,7 +36,7 @@ class student(models.Model):
 
 def get_rate_limit():
     try:
-        return setting.objects.get(pk=1).rate_limit
+        return Setting.objects.get(pk=1).rate_limit
     except:
-        setting.objects.create(rate_limit=2)
+        Setting.objects.create(rate_limit=2)
         return 2

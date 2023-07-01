@@ -5,7 +5,7 @@ from ast import literal_eval as make_tuple
 import requests
 from bs4 import BeautifulSoup
 
-from .models import student
+from .models import Student
 
 
 def read_data(xml):
@@ -205,9 +205,9 @@ def login(stun, password):
     login_url = "https://golestan.ikiu.ac.ir/Forms/AuthenticateUser/AuthUser.aspx"
 
     try:
-        user = student.objects.get(stun=stun)
+        user = Student.objects.get(stun=stun)
     except:
-        user = student(stun=stun)
+        user = Student(stun=stun)
 
     json_response = {}
     captcha = ""
@@ -591,5 +591,6 @@ def login(stun, password):
     print(latest_term)
     user_info = get_user_info(terms, latest_term, stun, faculty, major, grade)
     user_data = get_user_grades(user_info, s, session, response, res_cookies["u"], res_cookies["lt"], stun)
+    user.total_tries += 1
     user.save()
     return user_data
