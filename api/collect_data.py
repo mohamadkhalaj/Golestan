@@ -13,6 +13,17 @@ def read_data(xml):
     return soup
 
 
+def replace_arabic_with_persian(text):
+    # Define a translation table for Arabic to Persian characters
+    table = {
+        'ي': 'ی',
+        'ك': 'ک'
+    }
+    for key, value in table.items():
+        text = text.replace(key, value)
+    return text
+
+
 def get_pending_term(terms):
     latest = 0
     for index, term in enumerate(terms):
@@ -26,10 +37,10 @@ def get_pending_term(terms):
 def get_grade_faculty_major(response):
     soup = BeautifulSoup(response.content, "html.parser")
     script = soup.find_all("script")[0].string
-    faculty = re.findall("F61151 = \\'(.*?)\\';", script)[0]
-    major = re.findall("F17551 = \\'(.*?)\\';", script)[0]
-    grade = re.findall("F41301 = \\'(.*?)\\';", script)[0]
-    grade_type = re.findall("F41351 = \\'(.*?)\\';", script)[0]
+    faculty = replace_arabic_with_persian(re.findall("F61151 = \\'(.*?)\\';", script)[0])
+    major = replace_arabic_with_persian(re.findall("F17551 = \\'(.*?)\\';", script)[0])
+    grade = replace_arabic_with_persian(re.findall("F41301 = \\'(.*?)\\';", script)[0])
+    grade_type = replace_arabic_with_persian(re.findall("F41351 = \\'(.*?)\\';", script)[0])
 
     return faculty, major, grade + "-" + grade_type
 
@@ -38,9 +49,9 @@ def get_grades(courses):
     ar = []
     for course in courses:
         courses_json = {
-            "name": course["f0200"].strip(),
+            "name": replace_arabic_with_persian(course["f0200"].strip()),
             "nomre": course["f3945"].strip(),
-            "type": course["f3952"].strip(),
+            "type": replace_arabic_with_persian(course["f3952"].strip()),
             "vahed": course["f0205"].strip(),
         }
         ar.append(courses_json)
@@ -98,8 +109,8 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.41827066214011355&fid=0%3b12310&b=10&l=1&tck"
-        "=9D871E0D-BE1C-4E&&lastm=20180201081222",
+                   "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.41827066214011355&fid=0%3b12310&b=10&l=1&tck"
+                   "=9D871E0D-BE1C-4E&&lastm=20180201081222",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -188,7 +199,7 @@ def get_user_name(response):
     soup = BeautifulSoup(response.content, "html.parser")
     name = soup.find_all("input", attrs={"name": "TxtMiddle"})[0].attrs["value"]
     name = re.search(r'<F80501 val="(.*)" /><F80551 val="(.*)" /><F83171', name)
-    return name.group(1), name.group(2)
+    return replace_arabic_with_persian(name.group(1)), replace_arabic_with_persian(name.group(2))
 
 
 def get_seq(response):
@@ -351,7 +362,7 @@ def login(stun, password):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F0202_PROCESS_REP_FILTER/F0202_01_PROCESS_REP_FILTER_DAT.ASPX?r"
-        "=0.75486758742996&fid=1%3b102&b=10&l=1&tck=9691AB60-96A2-43&&lastm=20190829142532",
+                   "=0.75486758742996&fid=1%3b102&b=10&l=1&tck=9691AB60-96A2-43&&lastm=20190829142532",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -460,8 +471,8 @@ def login(stun, password):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0;12310&b=10&l=1&tck"
-        "=6123BBB3-7555-49&&lastm=20180201081222",
+                   "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0;12310&b=10&l=1&tck"
+                   "=6123BBB3-7555-49&&lastm=20180201081222",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -532,8 +543,8 @@ def login(stun, password):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0%3b12310&b=10&l=1&tck"
-        "=6123BBB3-7555-49&&lastm=20180201081222",
+                   "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0%3b12310&b=10&l=1&tck"
+                   "=6123BBB3-7555-49&&lastm=20180201081222",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -588,7 +599,6 @@ def login(stun, password):
     soup = read_data(res)
     terms = soup.find_all("n", attrs={"f4455": True})
     latest_term = get_pending_term(terms)
-    print(latest_term)
     user_info = get_user_info(terms, latest_term, stun, faculty, major, grade)
     user_data = get_user_grades(user_info, s, session, response, res_cookies["u"], res_cookies["lt"], stun)
     user.total_tries += 1

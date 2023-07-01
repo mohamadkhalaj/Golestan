@@ -20,8 +20,8 @@ class Setting(models.Model):
 
 
 class Student(models.Model):
-    stun = models.CharField(max_length=10, primary_key=True)
-    name = models.CharField(max_length=256)
+    stun = models.CharField(max_length=10, primary_key=True, verbose_name='Student number')
+    name = models.CharField(max_length=256, verbose_name='Student name')
     last_try = models.DateTimeField(auto_now=True)
     total_tries = models.PositiveBigIntegerField(default=0, editable=False)
 
