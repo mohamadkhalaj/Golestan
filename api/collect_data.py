@@ -142,9 +142,9 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
         courses = soup.find_all("n")[3:]
         course_data = get_grades(courses)
         if term == last_term:
-            last_term_gpa = user_info["summery"]["data"][-1]["moaddel"]
+            last_term_gpa = user_info["summery"]["data"][index]["moaddel"]
             if not last_term_gpa:
-                user_info["summery"]["data"][-1]["moaddel"] = current_term_gpa(course_data)
+                user_info["summery"]["data"][index]["moaddel"] = current_term_gpa(course_data)
 
         user_info[term] = course_data
 
@@ -588,6 +588,7 @@ def login(stun, password):
     soup = read_data(res)
     terms = soup.find_all("n", attrs={"f4455": True})
     latest_term = get_pending_term(terms)
+    print(latest_term)
     user_info = get_user_info(terms, latest_term, stun, faculty, major, grade)
     user_data = get_user_grades(user_info, s, session, response, res_cookies["u"], res_cookies["lt"], stun)
     user.save()
