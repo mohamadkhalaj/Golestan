@@ -36,7 +36,7 @@ class Student(models.Model):
 
 def get_rate_limit():
     try:
-        return Setting.objects.get(pk=1).rate_limit
+        return Setting.objects.first().rate_limit
     except:
         Setting.objects.create(rate_limit=2)
         return 2
