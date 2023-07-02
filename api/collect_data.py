@@ -15,21 +15,18 @@ def read_data(xml):
 
 def replace_arabic_with_persian(text):
     # Define a translation table for Arabic to Persian characters
-    table = {
-        'ي': 'ی',
-        'ك': 'ک'
-    }
+    table = {"ي": "ی", "ك": "ک"}
     for key, value in table.items():
         text = text.replace(key, value)
     return text
 
 
 def get_pending_term(terms):
-    latest = 0
+    latest = -1
     for index, term in enumerate(terms):
         if term["f4455"] == "مشغول به تحصيل _ عادي":
             latest = index
-    if latest == 0:
+    if latest == -1:
         latest = index
     return latest
 
@@ -109,8 +106,8 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-                   "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.41827066214011355&fid=0%3b12310&b=10&l=1&tck"
-                   "=9D871E0D-BE1C-4E&&lastm=20180201081222",
+        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.41827066214011355&fid=0%3b12310&b=10&l=1&tck"
+        "=9D871E0D-BE1C-4E&&lastm=20180201081222",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -342,14 +339,16 @@ def login(stun, password):
         "ctck": ctck,
     }
 
-    data = f"__VIEWSTATE=8PMg%2FXGkz21Jo6lFl1wV%2BG6zGMZJ27V9hN%2F" \
-           f"%2FQtcDNf4oZUW5mb0b7v4bV56pVIyLXFbCuSPD3cvVNuY6kqj4z" \
-           f"%2Bl8jWRZ5kGZgYaguBv4T27af0K1U3ZQwojfUXITMiBFjS1klAGeRDe2fRVcBFB3VA%3D%3D&__VIEWSTATEGENERATOR=25DF661B" \
-           f"&__EVENTVALIDATION=LbkdlrW%2FdjGKFMfWRDzI72UlPjqWROfiKJOUDUusM%2FxEcdNdKbRSY2iWnir" \
-           f"%2BZS2q14Ebo1ZEcVK0EoFGiRe7GYbblq13ynWnKvNE2FriZLj%2FCRnfLB%2BGykh" \
-           f"%2BpJCvpq9UUsSqIntjbwDRsiQEPeQQ3dbfmIAZCNPeytCcgtqATCPXTdD3i4FXL7yjPixv82eAbJcxcUY0hKwjdHSRKmDESzVK" \
-           f"%2FYQD2%2FFSW2qLX%2BytNTEZ57I%2BXBOAAr9QVJVuIw9u3KK27r%2FbycWoIN1m9zlSUA%3D%3D&Fm_Action=00&Frm_Type" \
-           f"=&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr%2F%3E&ex="
+    data = (
+        f"__VIEWSTATE=8PMg%2FXGkz21Jo6lFl1wV%2BG6zGMZJ27V9hN%2F"
+        f"%2FQtcDNf4oZUW5mb0b7v4bV56pVIyLXFbCuSPD3cvVNuY6kqj4z"
+        f"%2Bl8jWRZ5kGZgYaguBv4T27af0K1U3ZQwojfUXITMiBFjS1klAGeRDe2fRVcBFB3VA%3D%3D&__VIEWSTATEGENERATOR=25DF661B"
+        f"&__EVENTVALIDATION=LbkdlrW%2FdjGKFMfWRDzI72UlPjqWROfiKJOUDUusM%2FxEcdNdKbRSY2iWnir"
+        f"%2BZS2q14Ebo1ZEcVK0EoFGiRe7GYbblq13ynWnKvNE2FriZLj%2FCRnfLB%2BGykh"
+        f"%2BpJCvpq9UUsSqIntjbwDRsiQEPeQQ3dbfmIAZCNPeytCcgtqATCPXTdD3i4FXL7yjPixv82eAbJcxcUY0hKwjdHSRKmDESzVK"
+        f"%2FYQD2%2FFSW2qLX%2BytNTEZ57I%2BXBOAAr9QVJVuIw9u3KK27r%2FbycWoIN1m9zlSUA%3D%3D&Fm_Action=00&Frm_Type"
+        f"=&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr%2F%3E&ex="
+    )
 
     headers1 = {
         "Host": "golestan.ikiu.ac.ir",
@@ -362,7 +361,7 @@ def login(stun, password):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F0202_PROCESS_REP_FILTER/F0202_01_PROCESS_REP_FILTER_DAT.ASPX?r"
-                   "=0.75486758742996&fid=1%3b102&b=10&l=1&tck=9691AB60-96A2-43&&lastm=20190829142532",
+        "=0.75486758742996&fid=1%3b102&b=10&l=1&tck=9691AB60-96A2-43&&lastm=20190829142532",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -471,8 +470,8 @@ def login(stun, password):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-                   "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0;12310&b=10&l=1&tck"
-                   "=6123BBB3-7555-49&&lastm=20180201081222",
+        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0;12310&b=10&l=1&tck"
+        "=6123BBB3-7555-49&&lastm=20180201081222",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
@@ -543,8 +542,8 @@ def login(stun, password):
         "Origin": "https://golestan.ikiu.ac.ir",
         "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-                   "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0%3b12310&b=10&l=1&tck"
-                   "=6123BBB3-7555-49&&lastm=20180201081222",
+        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0%3b12310&b=10&l=1&tck"
+        "=6123BBB3-7555-49&&lastm=20180201081222",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "frame",
         "Sec-Fetch-Mode": "navigate",
