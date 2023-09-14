@@ -9,8 +9,7 @@ from .models import Student
 
 
 def read_data(xml):
-    soup = BeautifulSoup(xml, "lxml")
-    return soup
+    return BeautifulSoup(xml, "lxml")
 
 
 def get_header(kwargs={}):
@@ -34,6 +33,19 @@ def get_header(kwargs={}):
     return header
 
 
+def get_data(url="", optional_attrs={}, headers={}, session_id=None, response=None):
+    if not response:
+        response = requests.get(
+            url,
+            cookies={"ASP.NET_SessionId": session_id} if session_id else {},
+            headers=get_header(headers),
+        )
+    response = response.content.decode("utf-8")
+    inputs = read_data(response).find_all("input", attrs={"id": True, "value": True})
+    attrs = {i["id"]: i["value"] for i in inputs} | optional_attrs
+    return "&".join([f"{k}={urllib.parse.quote_plus(v)}" for k, v in attrs.items()])
+
+
 def replace_arabic_with_persian(text):
     # Define a translation table for Arabic to Persian characters
     table = {"ي": "ی", "ك": "ک"}
@@ -53,8 +65,7 @@ def get_pending_term(terms):
 
 
 def get_grade_faculty_major(response):
-    soup = BeautifulSoup(response.content, "html.parser")
-    script = soup.find_all("script")[0].string
+    script = BeautifulSoup(response.content, "html.parser").find_all("script")[0].string
 
     def extract_value(pattern):
         match = re.search(pattern, script)
@@ -125,9 +136,7 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
 
     header = {
         "Content-Length": "595",
-        "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.41827066214011355&fid=0%3b12310&b=10&l=1&tck"
-        "=9D871E0D-BE1C-4E&&lastm=20180201081222",
+        "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
     }
     headers = get_header(header)
 
@@ -142,16 +151,17 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
             ("lastm", "20180201081222"),
         )
 
-        data = (
-            f"__VIEWSTATE=PSqS0taw2jaS4YTMUVe78LFSqRY0nc2wknK4DQuC%2F9KPJNv4%2BKLkm5Gg489PZPW6o7JM%2FuKFXvX"
-            f"%2FVkuDuHLyCQ3nwsDYNPfhBiuc6CCPBqpRQqP7Z6pQKhZMCTsq2IMTj09PgNxg6uFsUnIaaMpBxw%3D%3D"
-            f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION=Vs8M%2B9nHFU621jB1fDojqspw9XtULz4rCjkLOBl3%2B4"
-            f"%2B6w3KFDV%2BVcv3O%2F8YEONVav%2F%2BX%2BlVcW7L9KzYgQRRQakCNziokDrPK8ykb9cSPYl"
-            f"%2B1cMX8DrpUGu0EUQQUDXMsgr26ETIbuaj9nzFDI6FS"
-            f"%2B7xxsrW0OjSreXoTNbuZZ9aeURNKddDbnkicqURFZq42ZrL94C2I9yuXtRYky2gdu%2BV3F0HMCAnk"
-            f"%2FTvvddr5YrIoHyTmUhpJmxBNi%2BimnjXlrlcMDNBBTGFCzohQQksOTA%3D%3D&Fm_Action=80&Frm_Type=0&Frm_No"
-            f"=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr+F41251%3D%22{Stun}%22+F43501%3D%22{term}%22%2F%3E&ex="
-        )
+        attrs = {
+            "Fm_Action": "80",
+            "Frm_Type": "0",
+            "Frm_No": "",
+            "TicketTextBox": ctck,
+            "XMLStdHlp": "",
+            "TxtMiddle": f'<r F41251="{Stun}" F43501="{term}"/>',
+            "ex": "",
+        }
+
+        data = get_data(response=response, optional_attrs=attrs)
 
         response = s.post(
             "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
@@ -162,12 +172,10 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
         )
 
         res = re.findall("T01XML='(.*)';", response.content.decode("utf-8"))[0]
-        soup = read_data(res)
-        courses = soup.find_all("n")[3:]
+        courses = read_data(res).find_all("n")[3:]
         course_data = get_grades(courses)
         if term == last_term:
-            last_term_gpa = user_info["summery"]["data"][index]["moaddel"]
-            if not last_term_gpa:
+            if not user_info["summery"]["data"][index]["moaddel"]:
                 user_info["summery"]["data"][index]["moaddel"] = current_term_gpa(course_data)
 
         user_info[term] = course_data
@@ -202,21 +210,23 @@ def get_user_info(terms, latest_term, Stun, faculty, major, grade):
 
 
 def get_ticket(response):
-    soup = BeautifulSoup(response.content, "html.parser")
-    ctck = soup.find_all("input", attrs={"id": "TicketTextBox"})[0].attrs["value"]
-    return ctck
+    return (
+        BeautifulSoup(response.content, "html.parser")
+        .find_all("input", attrs={"id": "TicketTextBox"})[0]
+        .attrs["value"]
+    )
 
 
 def get_user_name(response):
-    soup = BeautifulSoup(response.content, "html.parser")
-    name = soup.find_all("input", attrs={"name": "TxtMiddle"})[0].attrs["value"]
+    name = (
+        BeautifulSoup(response.content, "html.parser").find_all("input", attrs={"name": "TxtMiddle"})[0].attrs["value"]
+    )
     name = re.search(r'<F80501 val="(.*)" /><F80551 val="(.*)" /><F83171', name)
     return replace_arabic_with_persian(name.group(1)), replace_arabic_with_persian(name.group(2))
 
 
 def get_seq(response):
-    res = make_tuple(re.findall("parent.Commander.SavAut(.*?);", response.content.decode("utf-8"))[0])
-    return res[6]
+    return make_tuple(re.findall("parent.Commander.SavAut(.*?);", response.content.decode("utf-8"))[0])[6]
 
 
 def get_session_id(response):
@@ -234,7 +244,6 @@ def login(stun, password):
 
     json_response = {}
     captcha = ""
-    password = urllib.parse.quote_plus(password)
 
     cookies = {
         "u": "",
@@ -250,16 +259,14 @@ def login(stun, password):
     }
     headers = get_header(header)
 
-    data = (
-        f"__VIEWSTATE"
-        f"=%2FwEPDwUKMjA2NTYzNTQ5MmRk3pMVc3vrMpmJPeFlNuTZNAqnZ1IuvBAh7F6ibaOvjLcRmUq1Bo93homnh5DYRQi8BRW5Rzfi"
-        f"%2BYZuKAERQqxuQQ%3D%3D&__VIEWSTATEGENERATOR=6A475423&__EVENTVALIDATION=%2FwEdAAZLlyHuYR3BLALr37"
-        f"%2Bc2m3n4ALG8S7ZiLlJqSsuXBsjGz"
-        f"%2FLlbfviBrHuco87ksZgLcCRt9NnSPADSFObzNVq3ShPZSQos3ErAwfDmhlNwH4qEsT6FfmV7ULQ7j"
-        f"%2FFGM5sO5GzNDLxCLDFj1724Jc3Y%2BlrbM5jHMQ3800JLSzB8cvT0PujcljIJ7JpjSJMqHuPBKXt1c%2B%2BVTuIBSvjVJnUw2o"
-        f"&TxtMiddle=%3Cr+F51851%3D%22%22+F80401%3D%22{password}%22+F80351%3D%22{stun}%22+F51701%3D%22"
-        f"{captcha}%22+F83181%3D%22%22%2F%3E&Fm_Action=09&Frm_Type=&Frm_No=&TicketTextBox="
-    )
+    attrs = {
+        "TxtMiddle": f'<r F51851="" F80401="{password}" F80351="{stun}" F51701="{captcha}" F83181=""/>',
+        "Fm_Action": "09",
+        "Frm_Type": "",
+        "Frm_No": "",
+        "TicketTextBox": "",
+    }
+    data = get_data(url=login_url, optional_attrs=attrs)
 
     ## First request
     s = requests.Session()
@@ -342,21 +349,21 @@ def login(stun, password):
         "ctck": ctck,
     }
 
-    data = (
-        f"__VIEWSTATE=8PMg%2FXGkz21Jo6lFl1wV%2BG6zGMZJ27V9hN%2F"
-        f"%2FQtcDNf4oZUW5mb0b7v4bV56pVIyLXFbCuSPD3cvVNuY6kqj4z"
-        f"%2Bl8jWRZ5kGZgYaguBv4T27af0K1U3ZQwojfUXITMiBFjS1klAGeRDe2fRVcBFB3VA%3D%3D&__VIEWSTATEGENERATOR=25DF661B"
-        f"&__EVENTVALIDATION=LbkdlrW%2FdjGKFMfWRDzI72UlPjqWROfiKJOUDUusM%2FxEcdNdKbRSY2iWnir"
-        f"%2BZS2q14Ebo1ZEcVK0EoFGiRe7GYbblq13ynWnKvNE2FriZLj%2FCRnfLB%2BGykh"
-        f"%2BpJCvpq9UUsSqIntjbwDRsiQEPeQQ3dbfmIAZCNPeytCcgtqATCPXTdD3i4FXL7yjPixv82eAbJcxcUY0hKwjdHSRKmDESzVK"
-        f"%2FYQD2%2FFSW2qLX%2BytNTEZ57I%2BXBOAAr9QVJVuIw9u3KK27r%2FbycWoIN1m9zlSUA%3D%3D&Fm_Action=00&Frm_Type"
-        f"=&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr%2F%3E&ex="
-    )
+    attrs = {
+        "Fm_Action": "00",
+        "Frm_Type": "",
+        "Frm_No": "",
+        "TicketTextBox": ctck,
+        "XMLStdHlp": "",
+        "TxtMiddle": "<r/>",
+        "ex": "",
+    }
+
+    data = get_data(response=response, optional_attrs=attrs)
 
     header = {
         "Content-Length": "2551",
-        "Referer": "https://golestan.ikiu.ac.ir/Forms/F0202_PROCESS_REP_FILTER/F0202_01_PROCESS_REP_FILTER_DAT.ASPX?r"
-        "=0.75486758742996&fid=1%3b102&b=10&l=1&tck=9691AB60-96A2-43&&lastm=20190829142532",
+        "Referer": "https://golestan.ikiu.ac.ir/Forms/F0202_PROCESS_REP_FILTER/F0202_01_PROCESS_REP_FILTER_DAT.ASPX",
     }
     headers1 = get_header(header)
 
@@ -442,9 +449,7 @@ def login(stun, password):
 
     header = {
         "Content-Length": "549",
-        "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0;12310&b=10&l=1&tck"
-        "=6123BBB3-7555-49&&lastm=20180201081222",
+        "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
     }
     headers = get_header(header)
 
@@ -457,12 +462,8 @@ def login(stun, password):
         ("tck", save_tick),
         ("lastm", "20230514110830"),
     )
-    data = (
-        f"__VIEWSTATE=%2B4JaHQdzFS0AQBA3xD5k4JLGZuFB2TvLEMSoO00eytx83bhToohV%2BGSK11jXdQ%2Bu%2BKMVMTjEO"
-        f"%2BeM8774ddKWRIB5itd5khSxV25sBMwUpb%2B5M%2FmK%2BulXmM6qCxSfNnqtXrR%2BM51Vf71DDyJH3e5tIg%3D%3D"
-        f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION=FGuN%2BlEw%2BVnPsZEf%2B"
-        f"%2FUj0cwUzIZHUHxXaiNu04XCxH7myMpYXQUtUHEpELGv14hyq4wMzunzlrqlja7MrWZ5kBDBTLpfDMqW7LnqwNmtTWdGQOUeVUe33xiTE1%2FgOOPTzNYZeMaEkV9mz1TPW9Rr8PFcGPTFfTh4WRx1LqkYWllWTAxRal3vQGGp4QsqN1gCrG8trbSPBNzGLSvvxrIUMZelNEy3s7UxyydH5wouLoPTGSOZq6XSL1aKh%2BkL6cZEoxaCvyVHwoA5%2FtHBQm5G7A%3D%3D&Fm_Action=00&Frm_Type=&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr%2F%3E&ex="
-    )
+    attrs["TicketTextBox"] = ctck
+    data = get_data(response=response, optional_attrs=attrs)
 
     ## Fifth request
     response = s.post(
@@ -502,18 +503,21 @@ def login(stun, password):
 
     header = {
         "Content-Length": "575",
-        "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
-        "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0%3b12310&b=10&l=1&tck"
-        "=6123BBB3-7555-49&&lastm=20180201081222",
+        "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
     }
     headers = get_header(header)
 
-    data = (
-        f"__VIEWSTATE=qxK%2FppR35p5Aud2d23a%2FzBn0bVp1IbJ3fCjyBF0z7P%2BcWa149tMd2W3IPjiKz"
-        f"%2FQgblrupixd0OeDtIT9ZdnhdeL8cB2%2FFDcW9qBhJ8WXskwUF7J3lSqbzmxGnF1NVKudV1T270p51Uk%2FL1llMj9hCQ%3D%3D"
-        f"&__VIEWSTATEGENERATOR=6AC8DB9B&__EVENTVALIDATION"
-        f"=kqy8QEHTvRp1tGzItQv8Zw7V0gg9FSEoYTb0Tuys5EWy1zJ49l14RMA9YVoi7OGATV2Wc4TdXhKNHzU4mYPxbu86iw75hcLx6jSdCNcP1LNBlw1jwrb6x5bhcEPIRSkph7QSNYldljuklZSaP4u%2BaplVnRZMITqO0xknPzR0wKh1lzumRetFMreciDVoKW22xaTEBm0SFhNYaE0%2F6LfnnvIA84YYYr4WYxHT6nSiQ9WyAu%2FHCgHeNd%2BxOQnYRIN7umbWtZqMX58%2F00UyS1tH0Q%3D%3D&Fm_Action=08&Frm_Type=0&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr+F41251%3D%22{stun}%22%2F%3E&ex="
-    )
+    attrs = {
+        "Fm_Action": "08",
+        "Frm_Type": "0",
+        "Frm_No": "",
+        "TicketTextBox": ctck,
+        "XMLStdHlp": "",
+        "TxtMiddle": f'<r F41251="{stun}"/>',
+        "ex": "",
+    }
+
+    data = get_data(response=response, optional_attrs=attrs)
 
     ## Fifth request - second
     response = s.post(
