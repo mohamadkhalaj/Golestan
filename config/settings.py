@@ -3,7 +3,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "qc/f3wgwNYn0I8M0LGu+rxXLVb2mXRYI+MmJs79iODI1eHuegc1v4fa5jJAKz3JO1Kqq5x/Qa4Nt+d3Y8/K7bA=="
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 
