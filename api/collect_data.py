@@ -13,6 +13,27 @@ def read_data(xml):
     return soup
 
 
+def get_header(kwargs={}):
+    header = {
+        "Host": "golestan.ikiu.ac.ir",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Origin": "https://golestan.ikiu.ac.ir",
+        "Dnt": "1",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "frame",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "same-origin",
+        "Te": "trailers",
+    }
+    for key, value in kwargs.items():
+        header[key] = value
+    return header
+
+
 def replace_arabic_with_persian(text):
     # Define a translation table for Arabic to Persian characters
     table = {"ي": "ی", "ك": "ک"}
@@ -22,38 +43,45 @@ def replace_arabic_with_persian(text):
 
 
 def get_pending_term(terms):
-    latest = -1
+    latest_index = -1
     for index, term in enumerate(terms):
         if term["f4455"] == "مشغول به تحصيل _ عادي":
-            latest = index
-    if latest == -1:
-        latest = index
-    return latest
+            latest_index = index
+    if latest_index == -1:
+        latest_index = index
+    return latest_index
 
 
 def get_grade_faculty_major(response):
     soup = BeautifulSoup(response.content, "html.parser")
     script = soup.find_all("script")[0].string
-    faculty = replace_arabic_with_persian(re.findall("F61151 = \\'(.*?)\\';", script)[0])
-    major = replace_arabic_with_persian(re.findall("F17551 = \\'(.*?)\\';", script)[0])
-    grade = replace_arabic_with_persian(re.findall("F41301 = \\'(.*?)\\';", script)[0])
-    grade_type = replace_arabic_with_persian(re.findall("F41351 = \\'(.*?)\\';", script)[0])
+
+    def extract_value(pattern):
+        match = re.search(pattern, script)
+        if match:
+            return replace_arabic_with_persian(match.group(1))
+        return None
+
+    faculty = extract_value("F61151 = \\'(.*?)\\';")
+    major = extract_value("F17551 = \\'(.*?)\\';")
+    grade = extract_value("F41301 = \\'(.*?)\\';")
+    grade_type = extract_value("F41351 = \\'(.*?)\\';")
 
     return faculty, major, grade + "-" + grade_type
 
 
 def get_grades(courses):
-    ar = []
+    grades = []
     for course in courses:
-        courses_json = {
+        course_json = {
             "name": replace_arabic_with_persian(course["f0200"].strip()),
             "nomre": course["f3945"].strip(),
             "type": replace_arabic_with_persian(course["f3952"].strip()),
             "vahed": course["f0205"].strip(),
         }
-        ar.append(courses_json)
+        grades.append(course_json)
 
-    return ar
+    return grades
 
 
 def is_float(s):
@@ -95,25 +123,13 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
         "stdno": Stun,
     }
 
-    headers = {
-        "Host": "golestan.ikiu.ac.ir",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate",
-        "Content-Type": "application/x-www-form-urlencoded",
+    header = {
         "Content-Length": "595",
-        "Origin": "https://golestan.ikiu.ac.ir",
-        "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
         "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.41827066214011355&fid=0%3b12310&b=10&l=1&tck"
         "=9D871E0D-BE1C-4E&&lastm=20180201081222",
-        "Upgrade-Insecure-Requests": "1",
-        "Sec-Fetch-Dest": "frame",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "same-origin",
-        "Te": "trailers",
     }
+    headers = get_header(header)
 
     for index, term in enumerate(user_info["summery"]["Allterms"]):
         ctck = get_ticket(response)
@@ -164,25 +180,24 @@ def get_user_info(terms, latest_term, Stun, faculty, major, grade):
     term = terms[latest_term]
     user_info = {}
     user_data = {}
-    ar = []
-    for t in terms:
-        temp = {"term": t["f4350"].strip(), "moaddel": t["f4360"].strip(), "vahed": t["f4365"].strip()}
-        ar.append(temp)
 
-    user_data["data"] = ar
-    user_data["Allterms"] = [t["f4350"].strip() for index, t in enumerate(terms) if index <= latest_term]
+    user_data["data"] = [
+        {"term": t["f4350"].strip(), "moaddel": t["f4360"].strip(), "vahed": t["f4365"].strip()} for t in terms
+    ]
+    user_data["Allterms"] = [t["f4350"].strip() for t in terms[: latest_term + 1]]
     user_data["Voroodi"] = "1" + user_data["Allterms"][0][:-1]
     user_data["term"] = term["f4350"].strip()
     user_data["termYear"] = term["f4350"].strip()
     user_data["akhzShode"] = term["cumget"].strip()
     user_data["passShode"] = term["cumpas"].strip()
     user_data["moaddelKol"] = term["cumgpa"].strip()
-    user_data["name"] = Name[0] + " " + Name[1]
+    user_data["name"] = " ".join(Name)
     user_data["stun"] = Stun.strip()
     user_data["faculty"] = faculty.strip()
     user_data["major"] = major.strip()
     user_data["grade"] = grade.strip()
     user_info["summery"] = user_data
+
     return user_info
 
 
@@ -230,22 +245,10 @@ def login(stun, password):
         "seq": "",
     }
 
-    headers = {
-        "Host": "golestan.ikiu.ac.ir",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate",
-        "Content-Type": "application/x-www-form-urlencoded",
+    header = {
         "Content-Length": "585",
-        "Origin": "https://golestan.ikiu.ac.ir",
-        "Dnt": "1",
-        "Upgrade-Insecure-Requests": "1",
-        "Sec-Fetch-Dest": "frame",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "same-origin",
-        "Te": "trailers",
     }
+    headers = get_header(header)
 
     data = (
         f"__VIEWSTATE"
@@ -350,24 +353,12 @@ def login(stun, password):
         f"=&Frm_No=&TicketTextBox={ctck}&XMLStdHlp=&TxtMiddle=%3Cr%2F%3E&ex="
     )
 
-    headers1 = {
-        "Host": "golestan.ikiu.ac.ir",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate",
-        "Content-Type": "application/x-www-form-urlencoded",
+    header = {
         "Content-Length": "2551",
-        "Origin": "https://golestan.ikiu.ac.ir",
-        "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F0202_PROCESS_REP_FILTER/F0202_01_PROCESS_REP_FILTER_DAT.ASPX?r"
         "=0.75486758742996&fid=1%3b102&b=10&l=1&tck=9691AB60-96A2-43&&lastm=20190829142532",
-        "Upgrade-Insecure-Requests": "1",
-        "Sec-Fetch-Dest": "frame",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "same-origin",
-        "Te": "trailers",
     }
+    headers1 = get_header(header)
 
     ## Third request - second request post
     response = s.post(
@@ -412,20 +403,10 @@ def login(stun, password):
         ("lastm", "20190829142532"),
     )
 
-    headers = {
-        "Host": "golestan.ikiu.ac.ir",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate",
+    header = {
         "Referer": "https://golestan.ikiu.ac.ir/_Templates/Commander.htm",
-        "Dnt": "1",
-        "Upgrade-Insecure-Requests": "1",
-        "Sec-Fetch-Dest": "frame",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "same-origin",
-        "Te": "trailers",
     }
+    headers = get_header(header)
 
     ## Fourth request
     response = s.get(
@@ -459,25 +440,13 @@ def login(stun, password):
         "sno": "",
     }
 
-    headers = {
-        "Host": "golestan.ikiu.ac.ir",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate",
-        "Content-Type": "application/x-www-form-urlencoded",
+    header = {
         "Content-Length": "549",
-        "Origin": "https://golestan.ikiu.ac.ir",
-        "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
         "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0;12310&b=10&l=1&tck"
         "=6123BBB3-7555-49&&lastm=20180201081222",
-        "Upgrade-Insecure-Requests": "1",
-        "Sec-Fetch-Dest": "frame",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "same-origin",
-        "Te": "trailers",
     }
+    headers = get_header(header)
 
     ctck = get_ticket(response)
     params = (
@@ -531,25 +500,13 @@ def login(stun, password):
         ("lastm", "20180201081222"),
     )
 
-    headers = {
-        "Host": "golestan.ikiu.ac.ir",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate",
-        "Content-Type": "application/x-www-form-urlencoded",
+    header = {
         "Content-Length": "575",
-        "Origin": "https://golestan.ikiu.ac.ir",
-        "Dnt": "1",
         "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON"
         "/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx?r=0.08286821317886972&fid=0%3b12310&b=10&l=1&tck"
         "=6123BBB3-7555-49&&lastm=20180201081222",
-        "Upgrade-Insecure-Requests": "1",
-        "Sec-Fetch-Dest": "frame",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "same-origin",
-        "Te": "trailers",
     }
+    headers = get_header(header)
 
     data = (
         f"__VIEWSTATE=qxK%2FppR35p5Aud2d23a%2FzBn0bVp1IbJ3fCjyBF0z7P%2BcWa149tMd2W3IPjiKz"
