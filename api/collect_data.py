@@ -120,7 +120,7 @@ def current_term_gpa(courses):
     )
 
 
-def get_user_grades(user_info, s, session, response, u, lt, Stun):
+def get_user_grades(user_info, s, session, response, u, lt, Stun, fourth_request_url):
     last_term = user_info["summery"]["termYear"]
     cookies = {
         "u": u,
@@ -136,7 +136,7 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
 
     header = {
         "Content-Length": "595",
-        "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
+        "Referer": fourth_request_url,
     }
     headers = get_header(header)
 
@@ -164,7 +164,7 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun):
         data = get_data(response=response, optional_attrs=attrs)
 
         response = s.post(
-            "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
+            fourth_request_url,
             headers=headers,
             params=params,
             cookies=cookies,
@@ -316,8 +316,9 @@ def login(stun, password):
     )
 
     ## Second request
+    second_request_url = "https://golestan.ikiu.ac.ir/Forms/F0213_PROCESS_SYSMENU/F0213_01_PROCESS_SYSMENU_Dat.aspx"
     response = s.get(
-        "https://golestan.ikiu.ac.ir/Forms/F0213_PROCESS_SYSMENU/F0213_01_PROCESS_SYSMENU_Dat.aspx",
+        second_request_url,
         params=params,
         cookies=cookies,
     )
@@ -369,7 +370,7 @@ def login(stun, password):
 
     ## Third request - second request post
     response = s.post(
-        "https://golestan.ikiu.ac.ir/Forms/F0213_PROCESS_SYSMENU/F0213_01_PROCESS_SYSMENU_Dat.aspx",
+        second_request_url,
         params=params,
         cookies=cookies,
         data=data,
@@ -416,8 +417,11 @@ def login(stun, password):
     headers = get_header(header)
 
     ## Fourth request
+    fourth_request_url = (
+        "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx"
+    )
     response = s.get(
-        "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
+        fourth_request_url,
         headers=headers,
         params=params,
         cookies=cookies,
@@ -449,7 +453,7 @@ def login(stun, password):
 
     header = {
         "Content-Length": "549",
-        "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
+        "Referer": fourth_request_url,
     }
     headers = get_header(header)
 
@@ -467,7 +471,7 @@ def login(stun, password):
 
     ## Fifth request
     response = s.post(
-        "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
+        fourth_request_url,
         headers=headers,
         params=params,
         cookies=cookies,
@@ -503,7 +507,7 @@ def login(stun, password):
 
     header = {
         "Content-Length": "575",
-        "Referer": "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
+        "Referer": fourth_request_url,
     }
     headers = get_header(header)
 
@@ -521,7 +525,7 @@ def login(stun, password):
 
     ## Fifth request - second
     response = s.post(
-        "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx",
+        fourth_request_url,
         headers=headers,
         params=params,
         cookies=cookies,
@@ -560,7 +564,9 @@ def login(stun, password):
     terms = soup.find_all("n", attrs={"f4455": True})
     latest_term = get_pending_term(terms)
     user_info = get_user_info(terms, latest_term, stun, faculty, major, grade)
-    user_data = get_user_grades(user_info, s, session, response, res_cookies["u"], res_cookies["lt"], stun)
+    user_data = get_user_grades(
+        user_info, s, session, response, res_cookies["u"], res_cookies["lt"], stun, fourth_request_url
+    )
     user.total_tries += 1
     user.save()
     return user_data
