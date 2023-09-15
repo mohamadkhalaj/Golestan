@@ -1,6 +1,7 @@
 import re
 import urllib.parse
 from ast import literal_eval as make_tuple
+from typing import Any
 
 import requests
 from bs4 import BeautifulSoup
@@ -12,7 +13,9 @@ def read_data(xml):
     return BeautifulSoup(xml, "lxml")
 
 
-def get_header(kwargs={}):
+def get_header(kwargs=None):
+    if kwargs is None:
+        kwargs = {}
     header = {
         "Host": "golestan.ikiu.ac.ir",
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0",
@@ -33,7 +36,11 @@ def get_header(kwargs={}):
     return header
 
 
-def get_data(url="", optional_attrs={}, headers={}, session_id=None, response=None):
+def get_data(url="", optional_attrs=None, headers=None, session_id=None, response=None):
+    if headers is None:
+        headers = {}
+    if optional_attrs is None:
+        optional_attrs = {}
     if not response:
         response = requests.get(
             url,
@@ -89,6 +96,10 @@ def get_grades(courses):
             "nomre": course["f3945"].strip(),
             "type": replace_arabic_with_persian(course["f3952"].strip()),
             "vahed": course["f0205"].strip(),
+            "natije_nomre": replace_arabic_with_persian(course["f3965"].strip()),
+            "vaziat_nomre": replace_arabic_with_persian(course["f3955"].strip()),
+            "eteraz": replace_arabic_with_persian(course["f5185"].strip()),
+            "vaziat_dars": replace_arabic_with_persian(course["f3940"].strip()),
         }
         grades.append(course_json)
 
@@ -134,7 +145,7 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun, fourth_request
         "stdno": Stun,
     }
 
-    header = {
+    header: dict[str, str | Any] = {
         "Content-Length": "595",
         "Referer": fourth_request_url,
     }
@@ -151,7 +162,7 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun, fourth_request
             ("lastm", "20180201081222"),
         )
 
-        attrs = {
+        attrs: dict[str, str | Any] = {
             "Fm_Action": "80",
             "Frm_Type": "0",
             "Frm_No": "",
@@ -254,12 +265,12 @@ def login(stun, password):
         "seq": "",
     }
 
-    header = {
+    header: dict[str, str] = {
         "Content-Length": "585",
     }
     headers = get_header(header)
 
-    attrs = {
+    attrs: dict[str, str | Any] = {
         "TxtMiddle": f'<r F51851="" F80401="{password}" F80351="{stun}" F51701="{captcha}" F83181=""/>',
         "Fm_Action": "09",
         "Frm_Type": "",
@@ -268,7 +279,7 @@ def login(stun, password):
     }
     data = get_data(url=login_url, optional_attrs=attrs)
 
-    ## First request
+    # First request
     s = requests.Session()
     response = s.post(login_url, headers=headers, data=data, cookies=cookies)
 
@@ -315,7 +326,7 @@ def login(stun, password):
         ("lastm", "20090829065642"),
     )
 
-    ## Second request
+    # Second request
     second_request_url = "https://golestan.ikiu.ac.ir/Forms/F0213_PROCESS_SYSMENU/F0213_01_PROCESS_SYSMENU_Dat.aspx"
     response = s.get(
         second_request_url,
@@ -368,7 +379,7 @@ def login(stun, password):
     }
     headers1 = get_header(header)
 
-    ## Third request - second request post
+    # Third request - second request post
     response = s.post(
         second_request_url,
         params=params,
@@ -416,7 +427,7 @@ def login(stun, password):
     }
     headers = get_header(header)
 
-    ## Fourth request
+    # Fourth request
     fourth_request_url = (
         "https://golestan.ikiu.ac.ir/Forms/F1802_PROCESS_MNG_STDJAMEHMON/F1802_01_PROCESS_MNG_STDJAMEHMON_Dat.aspx"
     )
@@ -469,7 +480,7 @@ def login(stun, password):
     attrs["TicketTextBox"] = ctck
     data = get_data(response=response, optional_attrs=attrs)
 
-    ## Fifth request
+    # Fifth request
     response = s.post(
         fourth_request_url,
         headers=headers,
@@ -523,7 +534,7 @@ def login(stun, password):
 
     data = get_data(response=response, optional_attrs=attrs)
 
-    ## Fifth request - second
+    # Fifth request - second
     response = s.post(
         fourth_request_url,
         headers=headers,
