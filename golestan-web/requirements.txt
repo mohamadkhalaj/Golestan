@@ -20,6 +20,7 @@ pathspec==0.9.0
 ply==3.11
 psycopg2==2.9.3
 Pygments==2.10.0
+django-environ==0.9.0 
 python-decouple==3.5
 python-editor==1.0.4
 pytz==2021.3

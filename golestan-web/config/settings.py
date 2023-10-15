@@ -1,10 +1,17 @@
 import os
 from pathlib import Path
 
+import environ
+
+env = environ.Env()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = "qc/f3wgwNYn0I8M0LGu+rxXLVb2mXRYI+MmJs79iODI1eHuegc1v4fa5jJAKz3JO1Kqq5x/Qa4Nt+d3Y8/K7bA=="
-DEBUG = False
-ALLOWED_HOSTS = ["*"]
+SECRET_KEY = env(
+    "DJANGO_SECRET_KEY",
+    default="OzIpoVl9pe2na9u7CeN4zXQCAyKDQSux3Oh4fP9tkvjdRTk60PAU8Uxm4umrE8ut",
+)
+DEBUG = env.bool("DJANGO_DEBUG", True)
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
@@ -54,11 +61,12 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": env.db(
+        "DATABASE_URL",
+        default="sqlite:///" + str(BASE_DIR) + "/db.sqlite3",
+    ),
 }
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -83,7 +91,7 @@ USE_TZ = True
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles/")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 MEDIA_URL = "/media/"
 

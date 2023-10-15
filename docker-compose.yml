@@ -1,0 +1,36 @@
+version: "3.11"
+
+services:
+  golestan-web:
+    restart: always
+    container_name: golestan-web
+    build: ./golestan-web
+    command: sh -c "while ! python manage.py sqlflush > /dev/null 2>&1; do sleep 1; done && \
+             python manage.py makemigrations && \
+             python manage.py migrate --noinput && \
+             python manage.py collectstatic --noinput && \
+             python manage.py createsuperuser --user admin --email exchange@localhost --noinput > /dev/null && \
+             gunicorn --workers=2 --threads=2 -b 0.0.0.0:8000 config.wsgi:application"
+    volumes:
+      - ./golestan-web:/golestan-web
+
+  db:
+    restart: always
+    container_name: db
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=golestan
+    volumes:
+      - ./postgre:/var/lib/postgresql/data
+
+  nginx:
+    restart: always
+    build: ./nginx/
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./web/staticfiles:/web/staticfiles
