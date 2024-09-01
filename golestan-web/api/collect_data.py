@@ -1,8 +1,9 @@
+import base64
 import re
 import urllib.parse
 from ast import literal_eval as make_tuple
 from typing import Any
-
+from .captcha_solver import get_captcha_text
 import requests
 from bs4 import BeautifulSoup
 
@@ -244,6 +245,18 @@ def get_session_id(response):
     return response.cookies.get_dict()["ASP.NET_SessionId"]
 
 
+def get_captcha_image():
+    response = requests.get('https://golestan.ikiu.ac.ir/_templates/unvarm/unvarm.aspx', params={'typ': '1'})
+    session = get_session_id(response)
+    cookies = {
+        'ASP.NET_SessionId': session,
+        'u': '',
+        'lt': '',
+    }
+    response = requests.get('https://golestan.ikiu.ac.ir/Forms/AuthenticateUser/captcha.aspx', cookies=cookies)
+    return session, base64.b64encode(response.content).decode('utf-8')
+
+
 def login(stun, password):
     global Name
     login_url = "https://golestan.ikiu.ac.ir/Forms/AuthenticateUser/AuthUser.aspx"
@@ -253,39 +266,47 @@ def login(stun, password):
     except:
         user = Student(stun=stun)
 
-    json_response = {}
-    captcha = ""
-
-    cookies = {
-        "u": "",
-        "lt": "",
-        "su": "",
-        "ft": "",
-        "f": "",
-        "seq": "",
-    }
-
     header: dict[str, str] = {
         "Content-Length": "585",
     }
     headers = get_header(header)
+    response = ""
 
-    attrs: dict[str, str | Any] = {
-        "TxtMiddle": f'<r F51851="" F80401="{password}" F80351="{stun}" F51701="{captcha}" F83181=""/>',
-        "Fm_Action": "09",
-        "Frm_Type": "",
-        "Frm_No": "",
-        "TicketTextBox": "",
-    }
-    data = get_data(url=login_url, optional_attrs=attrs)
+    retry_count = 0
+    while retry_count < 5:
+        session_id, captcha_image = get_captcha_image()
+        captcha = get_captcha_text(captcha_image)
+        cookies = {
+            "u": "",
+            "lt": "",
+            "su": "",
+            "ft": "",
+            "f": "",
+            "seq": "",
+            'ASP.NET_SessionId': session_id,
+        }
 
-    # First request
-    s = requests.Session()
-    response = s.post(login_url, headers=headers, data=data, cookies=cookies)
+        attrs: dict[str, str | Any] = {
+            "TxtMiddle": f'<r F51851="" F80351="{stun}" F80401="{password}" F51701="{captcha}" F83181=""/>',
+            "Fm_Action": "09",
+            "Frm_Type": "",
+            "Frm_No": "",
+            "TicketTextBox": "",
+        }
+        data = get_data(url=login_url, optional_attrs=attrs)
+        # First request
+        s = requests.Session()
+        response = s.post(login_url, headers=headers, data=data, cookies=cookies)
 
-    print("*" * 50, "First request:", "*" * 50)
-    print(response.text)
+        print("*" * 50, "First request:", "*" * 50)
+        print(response.text)
 
+        if "آخرين ورود" in response.text:
+            break
+        else:
+            retry_count += 1
+
+    json_response = {}
     try:
         ctck = get_ticket(response)
     except:
