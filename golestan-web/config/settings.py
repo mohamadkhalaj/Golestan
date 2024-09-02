@@ -4,15 +4,16 @@ from pathlib import Path
 import environ
 
 env = environ.Env()
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = env(
-    "DJANGO_SECRET_KEY",
-    default="OzIpoVl9pe2na9u7CeN4zXQCAyKDQSux3Oh4fP9tkvjdRTk60PAU8Uxm4umrE8ut",
-)
-DEBUG = env.bool("DJANGO_DEBUG", True)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+SECRET_KEY = env("DJANGO_SECRET_KEY")
+DEBUG = env.bool("DJANGO_DEBUG", False)
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
