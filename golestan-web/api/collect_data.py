@@ -99,7 +99,7 @@ def get_grades(courses):
             "vahed": course["f0205"].strip(),
             "natije_nomre": replace_arabic_with_persian(course["f3965"].strip()),
             "vaziat_nomre": replace_arabic_with_persian(course["f3955"].strip()),
-            "eteraz": replace_arabic_with_persian(course["f5185"].strip()),
+            "eteraz": replace_arabic_with_persian(course["tip_f3945"].strip()),
             "vaziat_dars": replace_arabic_with_persian(course["f3940"].strip()),
         }
         grades.append(course_json)
@@ -185,6 +185,7 @@ def get_user_grades(user_info, s, session, response, u, lt, Stun, fourth_request
 
         res = re.findall("T01XML='(.*)';", response.content.decode("utf-8"))[0]
         courses = read_data(res).find_all("n")[3:]
+        print(f'{courses=}')
         course_data = get_grades(courses)
         if term == last_term:
             if not user_info["summery"]["data"][index]["moaddel"]:
