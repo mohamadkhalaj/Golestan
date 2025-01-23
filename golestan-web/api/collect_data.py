@@ -108,6 +108,7 @@ def get_grades(courses):
 
 
 def is_float(s):
+    
     try:
         float(s)
         return True
@@ -264,7 +265,6 @@ def login(stun, password):
 
     try:
         user = Student.objects.get(stun=stun)
-        user.save()
     except:
         user = Student(stun=stun)
 
@@ -318,7 +318,6 @@ def login(stun, password):
     Name = get_user_name(response)
     full_name = Name[0] + " " + Name[1]
     user.name = full_name
-    user.save()
 
     res_cookies = response.cookies.get_dict()
 
